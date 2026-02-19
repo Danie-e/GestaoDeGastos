@@ -14,19 +14,28 @@ public class PessoaController : Controller
             Nome = "Daniela",
             Identificador = 1,
          },
+          new(){
+            DataNescimento = "29/11/2010",
+            Nome = "Edson",
+            Identificador = 2,
+         },
+        new(){
+            DataNescimento = "12/01/2003",
+            Nome = "Rafaela",
+            Identificador = 3,
+         },
     };
 
     [HttpPost]
     public void AdicionarPessoa([FromBody] Pessoa pessoa)
     {
-
         Pessoas.Add(pessoa);
     }
 
     [HttpGet]
-    public IEnumerable<Pessoa> ListarPessoas()
+    public IEnumerable<Pessoa> ListarPessoas([FromQuery] int skip = 0, [FromQuery] int take = 15)
     {
-        return Pessoas;
+        return Pessoas.Skip(skip).Take(take);
     }
 
     [HttpGet("{id}")]
