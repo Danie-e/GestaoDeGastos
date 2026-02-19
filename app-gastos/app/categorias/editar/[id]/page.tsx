@@ -1,14 +1,14 @@
 'use client';
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Usuario from "@//lib/Interface/Usuario";
+import Categoria from "@//lib/Interface/Categoria";
 
-export default function EditarUsuario() {
+export default function EditarCategoria() {
     const router = useRouter();
     const params = useParams();
 
-    const [dataNascimento, setDataNascimento] = useState('');
-    const [nome, setNome] = useState('');
+    const [descricao, setDescricao] = useState('');
+    const [finalidadeId, setFinalidade] = useState('');
 
     const [mensagem, setMensagem] = useState('');
     const [tipoMensagem, setTipoMensagem] = useState<'sucesso' | 'erro' | ''>('');
@@ -17,37 +17,38 @@ export default function EditarUsuario() {
 
 
     function limparFormulario() {
-        setDataNascimento('');
-        setNome('');
+        setDescricao('');
+        setFinalidade('');
     }
 
+
     useEffect(() => {
-        async function buscarUsuario() {
+        async function buscarCategoria() {
             try {
-                const endpoint = new URL(`/Pessoa/${id}`, rotaAPI).toString();
+                const endpoint = new URL(`/Categoria/${id}`, rotaAPI).toString();
 
                 const response = await fetch(endpoint);
 
                 if (!response.ok) {
                     setTipoMensagem('erro');
-                    setMensagem('Erro ao buscar a pessoa');
+                    setMensagem('Erro ao buscar a categoria');
                     return;
                 }
 
-                const data = await response.json() as Usuario;
+                const data = await response.json() as Categoria;
 
                 if (!data) {
                     setTipoMensagem('erro');
-                    setMensagem('Pessoa não encontrado');
+                    setMensagem('Categoria não encontrada');
                     return;
                 }
 
-                setDataNascimento(data.dataNascimento);
-                setNome(data.nome);
+                setDescricao(data.descricao);
+                setFinalidade(data.finalidadeId ? data.finalidadeId.toString() : '');
 
             } catch (error: any) {
                 setTipoMensagem('erro');
-                setMensagem(error.message || 'Erro ao carregar dados da pessoa');
+                setMensagem(error.message || 'Erro ao carregar dados da categoria');
             }
             //  finally {
             //     setLoading(false);
@@ -55,19 +56,19 @@ export default function EditarUsuario() {
         }
 
         if (id) {
-            buscarUsuario();
+            buscarCategoria();
         }
     }, [id]);
 
-    async function salvarPessoa(e: React.FormEvent) {
-        const endpoint = new URL(`/Pessoa/${id}`, rotaAPI).toString();
+    async function salvarCategoria(e: React.FormEvent) {
+        const endpoint = new URL(`/Categoria/${id}`, rotaAPI).toString();
         e.preventDefault();
         setMensagem('');
         setTipoMensagem('');
 
         const body = {
-            dataNascimento,
-            nome,
+            descricao,
+           finalidadeId,
         }
 
         try {
@@ -82,28 +83,28 @@ export default function EditarUsuario() {
 
             if (response.ok) {
                 setTipoMensagem('sucesso');
-                setMensagem('Pessoa atualizada com sucesso! Redirecionando...');
+                setMensagem('Categoria atualizada com sucesso! Redirecionando...');
 
                 // Redirecionar para página de endereço e telefone
                 setTimeout(() => {
-                    router.push(`/usuarios`);
+                    router.push(`/categorias`);
                 }, 1500);
             } else {
                 const data = await response.json();
 
                 setTipoMensagem('erro');
-                setMensagem(data.message || data.error || 'Erro ao atualizar Pessoa');
+                setMensagem(data.message || data.error || 'Erro ao atualizar Categoria');
             }
         } catch (error: any) {
             setTipoMensagem('erro');
-            setMensagem(error.message || 'Erro ao atualizar Pessoa');
+            setMensagem(error.message || 'Erro ao atualizar Categoria');
         }
     }
 
     return (
         <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100 text-slate-900">
             <div className="mx-auto my-6 sm:my-10 max-w-6xl gap-6 w-full px-4 sm:px-6 md:px-10">
-                <h1 className="text-2xl sm:text-3xl font-bold mb-6">Atualizar Pessoa</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold mb-6">Atualizar Categoria</h1>
 
                 {mensagem && (
                     <div className={`p-4 mb-4 rounded-md ${tipoMensagem === 'sucesso'
@@ -114,31 +115,34 @@ export default function EditarUsuario() {
                     </div>
                 )}
 
-                <form className="bg-white p-6 rounded-lg shadow-md" onSubmit={salvarPessoa}>
+                <form className="bg-white p-6 rounded-lg shadow-md" onSubmit={salvarCategoria}>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <label className="flex flex-col col-span-2">
-                            <span className="font-semibold text-sm mb-2">Nome: <span className="text-red-500">*</span></span>
+                            <span className="font-semibold text-sm mb-2">Descrição: <span className="text-red-500">*</span></span>
                             <input
                                 type="text"
-                                placeholder="Nome"
+                                placeholder="Descrição"
                                 maxLength={255}
-                                value={nome}
-                                onChange={(e) => setNome(e.target.value)}
+                                value={descricao}
+                                onChange={(e) => setDescricao(e.target.value)}
                                 className="border border-gray-300 rounded-md px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
                         </label>
-                        <label className="flex flex-col col-span-2">
-                            <span className="font-semibold text-sm mb-2">Data de Nascimento: <span className="text-red-500">*</span></span>
-                            <input
-                                type="date"
-                                placeholder="Data de Nascimento"
-                                value={dataNascimento}
-                                onChange={(e) => setDataNascimento(e.target.value)}
+                       <label className="flex flex-col col-span-2">
+                            <span className="font-semibold text-sm mb-2">Finalidade: <span className="text-red-500">*</span></span>
+                            <select
+                                value={finalidadeId}
+                                onChange={(e) => setFinalidade(e.target.value)}
                                 className="border border-gray-300 rounded-md px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
-                            />
+                            >
+                                <option value="" disabled>Selecione uma finalidade</option>
+                                <option value="1">Despesa</option>
+                                <option value="2">Receita</option>
+                            </select>
+
                         </label>
                     </div>
 
