@@ -12,5 +12,6 @@ namespace ApiGastos.Data
         public DbSet<Pessoa> Pessoas { get; set; }
         public DbSet<Categoria> Categorias { get; set; }
         public DbSet<Transacao> Transacoes { get; set; }
+        public DbSet<Finalidade> Finalidade { get; set; }
     }
 }

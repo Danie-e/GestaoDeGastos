@@ -76,8 +76,6 @@ public class PessoaController : Controller
 
         patch.ApplyTo(pessoaParaAtualizar, ModelState);
 
-        pessoaParaAtualizar.Identificador = id;
-
         if (!TryValidateModel(pessoaParaAtualizar))
             return ValidationProblem(ModelState);
 
