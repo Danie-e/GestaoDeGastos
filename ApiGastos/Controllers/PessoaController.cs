@@ -27,9 +27,10 @@ public class PessoaController : Controller
     };
 
     [HttpPost]
-    public void AdicionarPessoa([FromBody] Pessoa pessoa)
+    public IActionResult AdicionarPessoa([FromBody] Pessoa pessoa)
     {
         Pessoas.Add(pessoa);
+        return CreatedAtAction(nameof(RetornaPessoaPorId), new { id = pessoa.Identificador }, pessoa);
     }
 
     [HttpGet]
@@ -39,8 +40,14 @@ public class PessoaController : Controller
     }
 
     [HttpGet("{id}")]
-    public Pessoa RetornaPessoaPorId(int id)
+    public ActionResult<Pessoa> RetornaPessoaPorId(int id)
     {
-        return Pessoas.FirstOrDefault(p => p.Identificador.Equals(id))!;
+        Pessoa pessoaEncontrada = Pessoas.FirstOrDefault(p => p.Identificador.Equals(id));
+
+        if (pessoaEncontrada != null)
+            return Ok(pessoaEncontrada);
+        else
+            return NotFound();
+
     }
 }
