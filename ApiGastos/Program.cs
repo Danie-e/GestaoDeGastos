@@ -1,4 +1,10 @@
+using ApiGastos.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<Context>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("GastosConnection")));
 
 // Add services to the container.
 
