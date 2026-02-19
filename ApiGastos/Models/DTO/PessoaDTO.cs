@@ -4,6 +4,7 @@ namespace ApiGastos.Models.DTO;
 
 public class PessoaDTO
 {
+    public int Identificador { get;  set; }
 
     [Required(ErrorMessage = "O nome da pessoa é obrigatorio.")]
     [StringLength(200, ErrorMessage = "O nome da pessoa não pode exceder 200 caracteres.")]
@@ -11,20 +12,17 @@ public class PessoaDTO
 
 
     [Required]
-    public string DataNescimento { private get; set; }
+    public string DataNascimento { get; set; }
 
     public int Idade
     {
         get
         {
-            string[] valores = DataNescimento.Split("/");
-            int dia = int.Parse(valores[0]);
-            int mes = int.Parse(valores[1]);
-            int ano = int.Parse(valores[2]);
+            DateOnly dataNascimento = DateOnly.Parse(DataNascimento);
+            
+            int idade = DateTime.Now.Year - dataNascimento.Year;
 
-            int idade = DateTime.Now.Year - new DateOnly(ano, mes, dia).Year;
-
-            if ((DateTime.Now.Day < dia) && DateTime.Now.Month < mes)
+            if ((DateTime.Now.Day < dataNascimento.Day) && DateTime.Now.Month < dataNascimento.Month)
                 idade--;
 
             return idade;

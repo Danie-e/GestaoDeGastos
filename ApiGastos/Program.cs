@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//Realizando conexão  com o banco de dados SQL Server utilizando Entity Framework Core
+//Realizando conexï¿½o  com o banco de dados SQL Server utilizando Entity Framework Core
 builder.Services.AddDbContext<Context>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("GastosConnection")));
 
@@ -14,10 +14,20 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddControllers();
 
-// Configurando o Newtonsoft.Json para ignorar ciclos de referência, evitando erros de serialização
+// Configurando o Newtonsoft.Json para ignorar ciclos de referï¿½ncia, evitando erros de serializaï¿½ï¿½o
 builder.Services
     .AddControllers()
     .AddNewtonsoftJson();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Frontend3000", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -32,6 +42,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("Frontend3000");
 
 app.UseAuthorization();
 

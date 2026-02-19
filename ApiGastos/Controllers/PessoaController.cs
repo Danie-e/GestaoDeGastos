@@ -58,7 +58,7 @@ public class PessoaController : Controller
         _mapper.Map(pessoaDTO, pessoaEncontrada);
         _context.SaveChanges();
 
-        return NoContent();
+        return Ok(pessoaEncontrada);
     }
 
     [HttpPatch("{id}")]
@@ -76,6 +76,8 @@ public class PessoaController : Controller
 
         patch.ApplyTo(pessoaParaAtualizar, ModelState);
 
+        pessoaParaAtualizar.Identificador = id;
+
         if (!TryValidateModel(pessoaParaAtualizar))
             return ValidationProblem(ModelState);
 
@@ -89,9 +91,9 @@ public class PessoaController : Controller
     public ActionResult<Pessoa> DeletarPessoa(int id)
     {
         Pessoa pessoaEncontrada = _context.Pessoas.FirstOrDefault(p => p.Identificador.Equals(id));
-
-        if (pessoaEncontrada != null)
-            return Ok(pessoaEncontrada);
+                
+        if (pessoaEncontrada == null)
+            return NotFound();
 
         _context.Remove(pessoaEncontrada);
         _context.SaveChanges();
