@@ -9,5 +9,6 @@ public class PessoaProfile : Profile
     public PessoaProfile()
     {
         CreateMap<PessoaDTO, Pessoa>();
+        CreateMap<Pessoa, PessoaDTO>();
     }
 }

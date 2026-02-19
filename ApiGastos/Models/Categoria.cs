@@ -12,4 +12,6 @@ public class Categoria
     public string Descricao { get; set; }
 
     public Finalidade Finalidade { get; set; }
+    public IEnumerable<Transacao> Transacao { get; set; }
+
 }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ApiGastos.Models;
 
@@ -19,7 +20,7 @@ public class Transacao
     [Required(ErrorMessage = "O tipo da transação é obrigatorio.")]
     public Finalidade Tipo { get; set; }
 
-    public ICollection<Categoria> Categoria { get; set; }
+    public IEnumerable<Categoria> Categoria { get; set; }
 
     public Pessoa Pessoa { get; set; }
 }
