@@ -22,13 +22,19 @@ public class CategoriaController : Controller
 
 
     [HttpGet]
-    public IEnumerable<CategoriaDTO> ListarCategorias([FromQuery] int skip = 0, [FromQuery] int take = 15)
+    public IEnumerable<CategoriaDTO> ListarCategorias([FromQuery] int skip = 0, [FromQuery] int take = 15, [FromQuery] string finalidadeId = null)
     {
-        return _mapper.Map<List<CategoriaDTO>>(
+        List<CategoriaDTO> categorias = _mapper.Map<List<CategoriaDTO>>(
             _context.Categorias
                 .Include(c => c.Finalidade)
                 .Skip(skip)
                 .Take(take));
+
+
+        if (!string.IsNullOrWhiteSpace(finalidadeId))
+            return categorias = categorias.Where(c => c.FinalidadeId == int.Parse(finalidadeId)).ToList();
+
+        return categorias;
     }
 
     [HttpGet("{id}")]
