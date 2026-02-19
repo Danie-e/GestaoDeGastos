@@ -1,5 +1,7 @@
 ﻿using ApiGastos.Data;
 using ApiGastos.Models;
+using ApiGastos.Models.DTO;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ApiGastos.Controllers;
@@ -9,14 +11,17 @@ namespace ApiGastos.Controllers;
 public class PessoaController : Controller
 {
     private Context _context;
-    public PessoaController(Context context)
+    private IMapper _mapper;
+    public PessoaController(Context context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
 
     [HttpPost]
-    public IActionResult AdicionarPessoa([FromBody] Pessoa pessoa)
+    public IActionResult AdicionarPessoa([FromBody] PessoaDTO pessoaDTO)
     {
+        Pessoa pessoa = _mapper.Map<Pessoa>(pessoaDTO);
         _context.Pessoas.Add(pessoa);
         _context.SaveChanges();
         return CreatedAtAction(nameof(RetornaPessoaPorId), new { id = pessoa.Identificador }, pessoa);
@@ -39,4 +44,5 @@ public class PessoaController : Controller
             return NotFound();
 
     }
+
 }
