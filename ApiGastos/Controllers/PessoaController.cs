@@ -1,4 +1,5 @@
-﻿using ApiGastos.Models;
+﻿using ApiGastos.Data;
+using ApiGastos.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ApiGastos.Controllers;
@@ -7,42 +8,30 @@ namespace ApiGastos.Controllers;
 [Route("[controller]")]
 public class PessoaController : Controller
 {
-    private static List<Pessoa> Pessoas = new List<Pessoa>()
+    private Context _context;
+    public PessoaController(Context context)
     {
-         new(){
-            DataNescimento = "28/09/2001",
-            Nome = "Daniela",
-            Identificador = 1,
-         },
-          new(){
-            DataNescimento = "29/11/2010",
-            Nome = "Edson",
-            Identificador = 2,
-         },
-        new(){
-            DataNescimento = "12/01/2003",
-            Nome = "Rafaela",
-            Identificador = 3,
-         },
-    };
+        _context = context;
+    }
 
     [HttpPost]
     public IActionResult AdicionarPessoa([FromBody] Pessoa pessoa)
     {
-        Pessoas.Add(pessoa);
+        _context.Pessoas.Add(pessoa);
+        _context.SaveChanges();
         return CreatedAtAction(nameof(RetornaPessoaPorId), new { id = pessoa.Identificador }, pessoa);
     }
 
     [HttpGet]
     public IEnumerable<Pessoa> ListarPessoas([FromQuery] int skip = 0, [FromQuery] int take = 15)
     {
-        return Pessoas.Skip(skip).Take(take);
+        return _context.Pessoas.Skip(skip).Take(take);
     }
 
     [HttpGet("{id}")]
     public ActionResult<Pessoa> RetornaPessoaPorId(int id)
     {
-        Pessoa pessoaEncontrada = Pessoas.FirstOrDefault(p => p.Identificador.Equals(id));
+        Pessoa pessoaEncontrada = _context.Pessoas.FirstOrDefault(p => p.Identificador.Equals(id));
 
         if (pessoaEncontrada != null)
             return Ok(pessoaEncontrada);

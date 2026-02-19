@@ -33,5 +33,5 @@ public class Pessoa
         }
     }
 
-    public ICollection<Transacao> Transacao { get; set; }
+    public ICollection<Transacao>? Transacao { get; set; }
 }
