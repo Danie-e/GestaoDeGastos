@@ -4,6 +4,8 @@ namespace ApiGastos.Models;
 
 public class Pessoa
 {
+    [Key]
+    [Required]
     public int Identificador { get; set; }
 
     [Required(ErrorMessage = "O nome da pessoa é obrigatorio.")]
@@ -12,6 +14,7 @@ public class Pessoa
 
     [Required]
     public string DataNescimento { get; set; }
+
     public int Idade
     {
         get
@@ -29,4 +32,6 @@ public class Pessoa
             return idade;
         }
     }
+
+    public ICollection<Transacao> Transacao { get; set; }
 }
