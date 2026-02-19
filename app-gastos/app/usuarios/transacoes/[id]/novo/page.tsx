@@ -2,9 +2,11 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import type Categoria from "@/lib/Interface/Categoria";
+import Usuario from "@/lib/Interface/Usuario";
 
 export default function NovaTransacao() {
     const router = useRouter();
+    const [idade, setIdade] = useState(0);
     const [descricao, setDescricao] = useState('');
     const [valor, setValor] = useState(0);
     const [tipo, setTipo] = useState('');
@@ -17,7 +19,6 @@ export default function NovaTransacao() {
     const [tipoMensagem, setTipoMensagem] = useState<'sucesso' | 'erro' | ''>('');
     const rotaAPI = process.env.ROTA_API || 'https://localhost:7186'; // Fallback para desenvolvimento local
     const id = params.id as string;
-
 
     function limparFormulario() {
         setValor(0);
@@ -49,7 +50,7 @@ export default function NovaTransacao() {
         const body = {
             valor,
             descricao,
-            tipoId:tipo,
+            tipoId: tipo,
             listaCategorias,
             PessoaIdentificador: id
         }
@@ -71,7 +72,7 @@ export default function NovaTransacao() {
 
                 // Redirecionar para página de endereço e telefone
                 setTimeout(() => {
-                    router.push(`/usuarios/${id}/transacoes`);
+                    router.push(`/usuarios/transacoes/${id}`);
                 }, 1500);
             } else {
                 setTipoMensagem('erro');
@@ -83,6 +84,40 @@ export default function NovaTransacao() {
         }
     }
 
+    useEffect(() => {
+        async function buscarUsuario() {
+            try {
+                if (!id)
+                    return;
+
+                const endpoint = new URL(`/Pessoa/${id}`, rotaAPI).toString();
+
+                const response = await fetch(endpoint);
+
+                if (!response.ok) {
+                    setTipoMensagem('erro');
+                    setMensagem('Erro ao buscar a pessoa');
+                    return;
+                }
+
+                const data = await response.json() as Usuario;
+
+                if (!data) {
+                    setTipoMensagem('erro');
+                    setMensagem('Pessoa não encontrado');
+                    return;
+                }
+
+                setIdade(data.idade || 0);
+
+            } catch (error: any) {
+                setTipoMensagem('erro');
+                setMensagem(error.message || 'Erro ao carregar dados da pessoa');
+            }
+        }
+
+        buscarUsuario();
+    }, [id]);
 
     useEffect(() => {
         async function BuscarCategorias() {
@@ -168,7 +203,9 @@ export default function NovaTransacao() {
                             >
                                 <option value="" disabled>Selecione um tipo</option>
                                 <option value="1">Despesa</option>
-                                <option value="2">Receita</option>
+                                {idade >= 18
+                                    ? <option value="2">Receita</option>
+                                    : <></>}
                             </select>
                         </label>
                         <label className="flex flex-col col-span-2">

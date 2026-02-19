@@ -54,9 +54,12 @@ public class TransacaoController : Controller
     public IActionResult AdicionarTransacao([FromBody] TransacaoDTO TransacaoDTO)
     {
         Transacao transacao = _mapper.Map<Transacao>(TransacaoDTO);
-        transacao.Tipo = _context.Finalidade.FirstOrDefault(f => f.Id.Equals(TransacaoDTO.TipoId));
         transacao.Pessoa = _context.Pessoas.FirstOrDefault(p => p.Identificador.Equals(TransacaoDTO.PessoaIdentificador));
+        transacao.Tipo = _context.Finalidade.FirstOrDefault(f => f.Id.Equals(TransacaoDTO.TipoId));
         transacao.Categoria = _context.Categorias.Where(c =>  TransacaoDTO.ListaCategorias.Contains(c.Identificador)).ToList();
+
+        if (transacao.Pessoa.Idade < 18 && transacao.Tipo.Id != 1)
+            return Unauthorized("Idade Insuficiente.");
 
         _context.Transacoes.Add(transacao);
         _context.SaveChanges();
