@@ -20,31 +20,32 @@ public class PessoaController : Controller
         _mapper = mapper;
     }
 
+
+    [HttpGet]
+    public IEnumerable<PessoaDTO> ListarPessoas([FromQuery] int skip = 0, [FromQuery] int take = 15)
+    {
+        return _mapper.Map<List<PessoaDTO>>(_context.Pessoas.Skip(skip).Take(take));
+    }
+
+    [HttpGet("{id}")]
+    public ActionResult<PessoaDTO> RetornaPessoaPorId(int id)
+    {
+        Pessoa pessoaEncontrada = _context.Pessoas.FirstOrDefault(p => p.Identificador.Equals(id));
+
+        if (pessoaEncontrada == null)
+            return NotFound();
+
+        PessoaDTO pessoaDTO = _mapper.Map<PessoaDTO>(pessoaEncontrada);
+        return Ok(pessoaDTO);
+    }
+
     [HttpPost]
     public IActionResult AdicionarPessoa([FromBody] PessoaDTO pessoaDTO)
     {
         Pessoa pessoa = _mapper.Map<Pessoa>(pessoaDTO);
         _context.Pessoas.Add(pessoa);
         _context.SaveChanges();
-        return CreatedAtAction(nameof(RetornaPessoaPorId), new { id = pessoa.Identificador }, pessoa);
-    }
-
-    [HttpGet]
-    public IEnumerable<Pessoa> ListarPessoas([FromQuery] int skip = 0, [FromQuery] int take = 15)
-    {
-        return _context.Pessoas.Skip(skip).Take(take);
-    }
-
-    [HttpGet("{id}")]
-    public ActionResult<Pessoa> RetornaPessoaPorId(int id)
-    {
-        Pessoa pessoaEncontrada = _context.Pessoas.FirstOrDefault(p => p.Identificador.Equals(id));
-
-        if (pessoaEncontrada != null)
-            return Ok(pessoaEncontrada);
-        else
-            return NotFound();
-
+        return CreatedAtAction(nameof(RetornaPessoaPorId), new { id = pessoa.Identificador }, _mapper.Map<PessoaDTO>(pessoa));
     }
 
     [HttpPut("{id}")]
@@ -84,4 +85,18 @@ public class PessoaController : Controller
         return NoContent();
     }
 
+    [HttpDelete("{id}")]
+    public ActionResult<Pessoa> DeletarPessoa(int id)
+    {
+        Pessoa pessoaEncontrada = _context.Pessoas.FirstOrDefault(p => p.Identificador.Equals(id));
+
+        if (pessoaEncontrada != null)
+            return Ok(pessoaEncontrada);
+
+        _context.Remove(pessoaEncontrada);
+        _context.SaveChanges();
+
+        return NoContent();
+
+    }
 }
